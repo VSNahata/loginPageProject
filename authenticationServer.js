@@ -67,7 +67,7 @@ function signUp(req, res){
     console.log(dataArray);
 })
 
-if(dataArray.length!==0){
+
 for(let i = 0; i<dataArray.length;i++)
 {
   console.log(dataArray[0].username)
@@ -75,7 +75,7 @@ for(let i = 0; i<dataArray.length;i++)
   if(dataArray[0].username === name)
   res.status(404).send("this user already exist")
 }
-}
+
 let temp = {
   "username":username,
   "password":password,
