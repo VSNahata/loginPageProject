@@ -29,7 +29,7 @@
   Testing the server - run `npm run test-authenticationServer` command in terminal
  */
 
-const { log } = require("console");
+// const { log } = require("console");
 const express = require("express")
 const PORT = 3000;
 const app = express();
@@ -42,59 +42,54 @@ and if not, i will increase the global counter of uniqueId and write the informa
 */
 
 app.use(express.json());
-let uniqueId = 1
 
 const fs = require('fs');
 
 var dataArray = []
-var data = '[{"username":"ffgf","password":"varun1","firstName":"varun","lastName":"Singh"}]'
 function signUp(req, res){
-  let name = req.body.username;
+  let username = req.body.username;
   let password = req.body.password
   let firstName = req.body.firstName
   let lastName = req.body.lastName
 
-  
-
-  fs.readFileSync(__dirname+'/files/c.JSON', 'utf8', (err, data) => {
+  fs.readFileSync(__dirname+'/files/a.txt', 'utf8', (err, data) => {
     if (err) {
       console.error('Error reading the file:', err);
     return;
     }
-    let myArray = JSON.parse(data); //c.JSON file data go into myaray
-   
+    let myArray = JSON.parse(data); 
     dataArray = [...dataArray, ...myArray]
-    console.log(dataArray);
 })
-
-if(dataArray.length!==0){
-for(let i = 0; i<dataArray.length;i++)
-{
-  console.log(dataArray[0].username)
-  
-  if(dataArray[0].username === name)
-  res.status(404).send("this user already exist")
-}
-}
 let temp = {
   "username":username,
   "password":password,
   "firstName":firstName,
   "lastName":lastName
 }
-dataArray.push(temp)
-// console.log(dataArray[0]+" yeh wala ko finally text mein jana hai")
-// const dataToWrite = 'This is the content you want ';
+let flag = true
+if(dataArray.length!==0){
+for(let i = 0; i<dataArray.length;i++)
+{
+  console.log(dataArray[i].username)
+  
+  if(dataArray[i].username === username)
+  {flag = false
+  res.status(404).send("this user already exist")}
+}
+}
+
+if(flag) 
+{dataArray.push(temp)
+console.log(dataArray)
 const arrayData = JSON.stringify(dataArray);
-fs.writeFileSync('files\\c.txt', arrayData, (err) => {
+fs.writeFileSync('files\\a.txt', arrayData, (err) => {
   if (err) {
     console.error('Error writing to the file:', err);
   } else {
     console.log('Data has been written to the file successfully.');
   }
 });
-console.log(username)
-res.send("this is awesome")
+res.send("this is awesome")}
 
 }
 
@@ -103,7 +98,15 @@ app.post('/signup', signUp)
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`)
 })
-// yeh master waale pr change
+
 module.exports = app;
-//yeh abhi wale branch pr change
-//pull karni hai yeh line meko
+// one problem still persists , when i restart the server it erases and writes new data in text file.
+/*
+common points of error were =>
+1) Make sure that you're not calling response-sending methods 
+(like res.send(), res.json(), or res.end()) more than once
+ in your route handler or middleware. 
+ Once the response is sent, you cannot modify the headers.
+
+ 2)file ko likhne ka tareeka dekh lo 
+*/
