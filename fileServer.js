@@ -18,8 +18,33 @@
  */
 const express = require('express');
 const fs = require('fs');
+const fsPromise=require('fs/promises');
 const path = require('path');
 const app = express();
 
+var data ;
+function handleFiles(req,res){
+ fsPromise.readdir("./files")
+ .then(fileArray=>{
+  data=JSON.stringify(fileArray);
+ res.send(data);
+ })
+  .catch(err=>{
+    console.log(err);
+  })
+
+}
+
+function File(req,res){
+  let filename=req.params.filename;
+  res.sendFile(__dirname+"/files/"+filename);
+}
+
+app.get("/file/:filename",File);
+
+app.get("/file", handleFiles);
+app.listen(3000,()=>{
+  console.log('server is listining at port 3000');
+})
 
 module.exports = app;
