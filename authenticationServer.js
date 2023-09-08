@@ -33,77 +33,82 @@ const { log } = require("console");
 const express = require("express")
 const PORT = 3000;
 const app = express();
-// write your logic here, DONT WRITE app.listen(3000) when you're running tests, the tests will automatically start the server
-/*
-first i will go for signup, here the user will send his information in json format in body and i will run 
-a loop in the file in which i am writing the data of the user if he previously exist,
-if yes, then 400 bad request
-and if not, i will increase the global counter of uniqueId and write the information in the file and respond with 201
-*/
+// const uuidv4 = require("uuid/dist/v4.js")
 
 app.use(express.json());
 let uniqueId = 1
 
 const fs = require('fs');
 
-var dataArray = []
-var data = '[{"username":"ffgf","password":"varun1","firstName":"varun","lastName":"Singh"}]'
+
+
+
 function signUp(req, res){
-  let name = req.body.username;
-  let password = req.body.password
-  let firstName = req.body.firstName
-  let lastName = req.body.lastName
+  let temp=JSON.parse(JSON.stringify(req.body));
+ let {username, password, firstName, lastName}=temp;
+//  temp={id:uuidv4(),...temp}
 
-  
+ let dataArray = [];
 
-  fs.readFileSync(__dirname+'/files/c.JSON', 'utf8', (err, data) => {
-    if (err) {
-      console.error('Error reading the file:', err);
-    return;
-    }
+  var data=fs.readFileSync(__dirname+'/files/c.JSON', 'utf8') 
+   
     let myArray = JSON.parse(data); //c.JSON file data go into myaray
    
     dataArray = [...dataArray, ...myArray]
-    console.log(dataArray);
-})
+   
+  
+
 
 
 for(let i = 0; i<dataArray.length;i++)
-{
-  console.log(dataArray[0].username)
-  
-  if(dataArray[0].username === name)
-  res.status(404).send("this user already exist")
+{ 
+  if(dataArray[i].username === username){
+    res.status(404).send("this user already exist")
+    uniqueId=0;
+  }
 }
 
-let temp = {
-  "username":username,
-  "password":password,
-  "firstName":firstName,
-  "lastName":lastName
-}
-dataArray.push(temp)
-// console.log(dataArray[0]+" yeh wala ko finally text mein jana hai")
-// const dataToWrite = 'This is the content you want ';
+if(uniqueId)dataArray.push(temp);
+    console.log(dataArray);
+
 const arrayData = JSON.stringify(dataArray);
-fs.writeFileSync('files\\c.txt', arrayData, (err) => {
+fs.writeFileSync('files\\c.JSON', arrayData, (err) => {
   if (err) {
     console.error('Error writing to the file:', err);
   } else {
     console.log('Data has been written to the file successfully.');
   }
 });
-console.log(username)
+dataArray=[];
 res.send("this is awesome")
-
 }
 
-app.post('/signup', signUp)
+// function login(req,res){
+//   var enteredData=JSON.parse(JSON.stringify(req.body));
+//    let{username,password}=enteredData;
+
+//   let dataArray = [];
+
+//   var data=fs.readFileSync(__dirname+'/files/c.JSON', 'utf8') 
+   
+//     let myArray = JSON.parse(data); //c.JSON file data go into myaray
+   
+//     dataArray = [...myArray];
+
+//     for(let i=0; i<dataArray.length; i++)
+//     {
+
+//     }
+
+  
+// }
+app.post('/signup', signUp);
+
+// app.post("/login",login);
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`)
 })
-// yeh master waale pr change
+
 module.exports = app;
-//yeh abhi wale branch pr change
-//pull karni hai yeh line meko
+
